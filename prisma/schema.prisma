@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,38 +12,64 @@ model User {
   nom        String
   email      String      @unique
   password   String
-  role       Role        @default(EMPLOYE)   // <- enum Role au lieu de String
+  role       Role        @default(EMPLOYE)   // ✅ enum Role
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   articles   Article[]
   mouvements Mouvement[]
 }
 
+model Categorie {
+  id        Int       @id @default(autoincrement())
+  nom       String    @unique
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Fournisseur {
+  id        Int       @id @default(autoincrement())
+  nom       String    @unique
+  contact   String?
+  telephone String?
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model Article {
-  id          Int        @id @default(autoincrement())
-  nom         String
-  categorie   String
-  prixAchat   Float
-  prixVente   Float
-  quantite    Int
-  seuilAlerte Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  userId      Int
-  user        User       @relation(fields: [userId], references: [id])
-  mouvements  Mouvement[]
+  id           Int          @id @default(autoincrement())
+  nom          String
+  prixAchat    Float
+  prixVente    Float
+  quantite     Int
+  seuilAlerte  Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id])
+
+  categorieId  Int
+  categorie    Categorie    @relation(fields: [categorieId], references: [id])
+
+  fournisseurId Int
+  fournisseur   Fournisseur @relation(fields: [fournisseurId], references: [id])
+
+  mouvements   Mouvement[]
 }
 
 model Mouvement {
-  id        Int           @id @default(autoincrement())
-  type      TypeMouvement // <- enum au lieu de String
+  id        Int            @id @default(autoincrement())
+  type      TypeMouvement  // ✅ enum TypeMouvement
   quantite  Int
   articleId Int
-  article   Article       @relation(fields: [articleId], references: [id])
+  article   Article        @relation(fields: [articleId], references: [id])
   userId    Int
-  user      User          @relation(fields: [userId], references: [id])
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  user      User           @relation(fields: [userId], references: [id])
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }
 
 enum Role {

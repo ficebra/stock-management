@@ -23,6 +23,8 @@ export default function Navbar({ user: propUser }) {
 
     const links = [
         { name: "Tableau de bord", path: "/dashboard" },
+        { name: "Categories", path: "/categories" },
+        { name: "Fournisseurs", path: "/fournisseurs" },
         { name: "Articles", path: "/articles" },
         { name: "Mouvements", path: "/mouvements" },
         { name: "Historique", path: "/historique" },
