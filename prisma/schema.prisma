@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  nom        String
+  email      String      @unique
+  password   String
+  role       Role        @default(EMPLOYE)   // <- enum Role au lieu de String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  articles   Article[]
+  mouvements Mouvement[]
+}
+
+model Article {
+  id          Int        @id @default(autoincrement())
+  nom         String
+  categorie   String
+  prixAchat   Float
+  prixVente   Float
+  quantite    Int
+  seuilAlerte Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  mouvements  Mouvement[]
+}
+
+model Mouvement {
+  id        Int           @id @default(autoincrement())
+  type      TypeMouvement // <- enum au lieu de String
+  quantite  Int
+  articleId Int
+  article   Article       @relation(fields: [articleId], references: [id])
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EMPLOYE
+}
+
+enum TypeMouvement {
+  ENTREE
+  SORTIE
+}
