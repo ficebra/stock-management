@@ -1,24 +1,31 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma"
 
-// PUT - Modifier un fournisseur par ID
 export async function PUT(req, { params }) {
-    const data = await req.json();
-    const fournisseur = await prisma.fournisseurs.update({
-        where: { id: Number(params.id) },
-        data: {
-            nom: data.nom,
-            contact: data.contact,
-            telephone: data.telephone
-        }
-    });
-    return Response.json(fournisseur);
+    try {
+        const body = await req.json()
+        const fournisseur = await prisma.fournisseur.update({
+            where: { id: Number(params.id) },
+            data: {
+                nom: body.nom,
+                contact: body.contact || null,
+                telephone: body.telephone || null,
+            }
+        })
+        return Response.json(fournisseur)
+    } catch (error) {
+        console.error("❌ Erreur PUT Fournisseur:", error)
+        return Response.json({ error: error.message }, { status: 500 })
+    }
 }
 
-// DELETE - Supprimer un fournisseur par ID
 export async function DELETE(req, { params }) {
-    await prisma.fournisseurs.delete({
-        where: { id: Number(params.id) }
-    });
-    return Response.json({ success: true });
+    try {
+        await prisma.fournisseur.delete({
+            where: { id: Number(params.id) }
+        })
+        return Response.json({ success: true })
+    } catch (error) {
+        console.error("❌ Erreur DELETE Fournisseur:", error)
+        return Response.json({ error: error.message }, { status: 500 })
+    }
 }

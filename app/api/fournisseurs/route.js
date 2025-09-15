@@ -1,27 +1,33 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { Contact, Telescope } from "lucide-react";
+import prisma from "@/lib/prisma"
 
 export async function GET() {
     try {
-        const fournisseurs = await prisma.fournisseurs.findMany();
-        return NextResponse.json(fournisseurs);
+        const fournisseurs = await prisma.fournisseur.findMany({
+            orderBy: { createdAt: "desc" }
+        })
+        return Response.json(fournisseurs)
     } catch (error) {
-        return NextResponse.json(
-            { message: "Impossible de recuperer la liste des fournisseurs", error: error.message },
-            { status: 500 }
-        );
+        console.error("❌ Erreur GET Fournisseurs:", error)
+        return Response.json({ error: error.message }, { status: 500 })
     }
 }
 
 export async function POST(req) {
-    const { body } = await req.json();
-    const fournisseur = await prisma.fournisseurs.create({
-        data: {
-            nom: body.nom,
-            contact: body.contact,
-            telephone: body.telephone
-        }
-    })
-    return NextResponse.json(fournisseur)
+    try {
+        const body = await req.json()
+        console.log("📩 Fournisseur reçu:", body)
+
+        const fournisseur = await prisma.fournisseur.create({
+            data: {
+                nom: body.nom,
+                contact: body.contact || null,
+                telephone: body.telephone || null,
+            }
+        })
+
+        return Response.json(fournisseur)
+    } catch (error) {
+        console.error("❌ Erreur POST Fournisseur:", error)
+        return Response.json({ error: error.message }, { status: 500 })
+    }
 }
